@@ -99,7 +99,7 @@ def parse_file( fname, points, transform, screen, color ):
         elif(line[i] == 'save'):
             ppm_name = line[i+1]
             save_ppm_ascii( screen, ppm_name )
-            d = Popen( ['display', ppm_name], stdin=PIPE, stdout = PIPE, shell = True )
+            d = Popen( ['imdisplay', ppm_name], stdin=PIPE, stdout = PIPE, shell = True )
             d.communicate()
 
         elif(line[i] == 'quit'):
