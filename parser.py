@@ -33,4 +33,74 @@ The file follows the following format:
 See the file script for an example of the file format
 """
 def parse_file( fname, points, transform, screen, color ):
-    pass
+    comm = []
+    file = open(fname,'r')
+    line = file.readlines()
+    file.close()
+
+    for i in range(len(line)):
+        line[i] = line[i].rstrip()
+
+    for i in range(len(line)):
+        print(i+1)
+        if(line[i] == 'line'):
+            line2 = line[i+1]
+            line2 = line2.split(' ')
+            add_edge(points,int(line2[0]),int(line2[1]),int(line2[2]),int(line2[3]),int(line2[4]),int(line2[5]))
+
+        elif(line[i] == 'ident'):
+            comm.append('ident')
+
+        elif(line[i] == 'scale'):
+            line2 = line[i+1]
+            line2 = line2.split(' ')
+            track = make_scale(int(line2[0]),int(line2[1]),int(line2[2]))
+            comm.append(track)
+
+        elif(line[i] == 'move'):
+            line2 = line[i+1]
+            line2 = line2.split(' ')
+            track = make_translate(int(line2[0]),int(line2[1]),int(line2[2]))
+            comm.append(track)
+
+        elif(line[i] == 'rotate'):
+            line2 = line[i+1]
+            line2 = line2.split(' ')
+
+            if(line2[0] == 'x'):
+                comm.append(make_rotX(int(line2[1])))
+
+            elif(line2[0] == 'y'):
+                comm.append(make_rotY(int(line2[1])))
+
+            elif(line2[0] == 'z'):
+                comm.append(make_rotZ(int(line2[1])))
+
+        elif(line[i] == 'apply'):
+
+            for i in range(len(comm)):
+                line2 = comm.pop()
+
+                if(isinstance(line2,str)):
+                    ident(transform)
+
+                else:
+                    matrix_mult(line2,points)
+
+            for j in range(len(points)):
+                for k in range(len(points[j])):
+                    points[j][k] = int(round(points[j][k]))
+
+        elif(line[i] == 'display'):
+            clear_screen(screen)
+            draw_lines(points,screen,color)
+            display(screen)
+
+        elif(line[i] == 'save'):
+            ppm_name = line[i+1]
+            save_ppm_ascii( screen, ppm_name )
+            d = Popen( ['imdisplay', ppm_name], stdin=PIPE, stdout = PIPE, shell = True )
+            d.communicate()
+            
+        elif(line[i] == 'quit'):
+            break
